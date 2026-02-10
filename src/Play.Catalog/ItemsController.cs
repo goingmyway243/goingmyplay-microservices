@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Play.Catalog.Entities;
+using Play.Catalog.Services;
 
 namespace Play.Catalog
 {
@@ -7,74 +9,121 @@ namespace Play.Catalog
     [ApiController]
     public class ItemsController : ControllerBase
     {
-        private static readonly List<ItemDto> items = new()
+        private readonly IElasticsearchService _elasticsearchService;
+
+        public ItemsController(IElasticsearchService elasticsearchService)
         {
-            new ItemDto(Guid.NewGuid(), "Potion", "Restores a small amount of HP", 5, DateTimeOffset.UtcNow),
-            new ItemDto(Guid.NewGuid(), "Iron Sword", "A basic sword made of iron", 20, DateTimeOffset.UtcNow),
-            new ItemDto(Guid.NewGuid(), "Steel Shield", "Provides moderate protection", 15, DateTimeOffset.UtcNow)
-        };
+            _elasticsearchService = elasticsearchService;
+        }
 
         [HttpGet]
-        public IEnumerable<ItemDto> GetItems()
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
         {
-            return items;
+            var items = await _elasticsearchService.GetAllItemsAsync();
+            var itemDtos = items.Select(item => new ItemDto(
+                item.Id,
+                item.Name,
+                item.Description,
+                item.Price,
+                item.CreatedDate
+            ));
+            return Ok(itemDtos);
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ItemDto>>> SearchItems([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query cannot be empty");
+            }
+
+            var items = await _elasticsearchService.SearchItemsAsync(query);
+            var itemDtos = items.Select(item => new ItemDto(
+                item.Id,
+                item.Name,
+                item.Description,
+                item.Price,
+                item.CreatedDate
+            ));
+            return Ok(itemDtos);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ItemDto> GetItem(Guid id)
+        public async Task<ActionResult<ItemDto>> GetItem(Guid id)
         {
-            var item = items.FirstOrDefault(i => i.Id == id);
+            var item = await _elasticsearchService.GetItemAsync(id);
             if (item == null)
             {
                 return NotFound();
             }
-            return item;
+            return Ok(new ItemDto(item.Id, item.Name, item.Description, item.Price, item.CreatedDate));
         }
 
         [HttpPost]
         [Authorize]
-        public ActionResult<ItemDto> CreateItem(CreateItemDto createItemDto)
+        public async Task<ActionResult<ItemDto>> CreateItem(CreateItemDto createItemDto)
         {
-            var item = new ItemDto(Guid.NewGuid(), createItemDto.Name, createItemDto.Description, createItemDto.Price, DateTimeOffset.UtcNow);
-            items.Add(item);
-            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
+            var item = new Item
+            {
+                Id = Guid.NewGuid(),
+                Name = createItemDto.Name,
+                Description = createItemDto.Description,
+                Price = createItemDto.Price,
+                CreatedDate = DateTimeOffset.UtcNow
+            };
+
+            var success = await _elasticsearchService.IndexItemAsync(item);
+            if (!success)
+            {
+                return StatusCode(500, "Failed to create item");
+            }
+
+            var itemDto = new ItemDto(item.Id, item.Name, item.Description, item.Price, item.CreatedDate);
+            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, itemDto);
         }
 
         [HttpPut("{id}")]
         [Authorize]
-        public IActionResult UpdateItem(Guid id, UpdateItemDto updateItemDto)
+        public async Task<IActionResult> UpdateItem(Guid id, UpdateItemDto updateItemDto)
         {
-            var existingItem = items.FirstOrDefault(i => i.Id == id);
+            var existingItem = await _elasticsearchService.GetItemAsync(id);
             if (existingItem == null)
             {
                 return NotFound();
             }
 
-            var updatedItem = existingItem with
-            {
-                Name = updateItemDto.Name,
-                Description = updateItemDto.Description,
-                Price = updateItemDto.Price
-            };
+            existingItem.Name = updateItemDto.Name;
+            existingItem.Description = updateItemDto.Description;
+            existingItem.Price = updateItemDto.Price;
 
-            var index = items.FindIndex(i => i.Id == id);
-            items[index] = updatedItem;
+            var success = await _elasticsearchService.UpdateItemAsync(existingItem);
+            if (!success)
+            {
+                return StatusCode(500, "Failed to update item");
+            }
 
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         [Authorize]
-        public IActionResult DeleteItem(Guid id)
+        public async Task<IActionResult> DeleteItem(Guid id)
         {
-            var index = items.FindIndex(i => i.Id == id);
-            if (index == -1)
+            var item = await _elasticsearchService.GetItemAsync(id);
+            if (item == null)
             {
                 return NotFound();
             }
 
-            items.RemoveAt(index);
+            var success = await _elasticsearchService.DeleteItemAsync(id);
+            if (!success)
+            {
+                return StatusCode(500, "Failed to delete item");
+            }
+
             return NoContent();
         }
     }
 }
+
