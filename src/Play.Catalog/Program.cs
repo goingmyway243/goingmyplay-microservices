@@ -5,13 +5,15 @@ using Play.Catalog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure Elasticsearch
-var elasticsearchUrl = builder.Configuration.GetValue<string>("Elasticsearch:Url") ?? "http://localhost:9200";
+var elasticsearchUrl = builder.Configuration.GetConnectionString("elasticsearch") ?? "http://localhost:9200";
 var settings = new ElasticsearchClientSettings(new Uri(elasticsearchUrl))
     .DefaultIndex("catalog-items");
 
@@ -21,14 +23,15 @@ builder.Services.AddScoped<IElasticsearchService, ElasticsearchService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:7164"; // IdentityServer URL
+        var identityUrl = builder.Configuration.GetConnectionString("identity") ?? "https://localhost:7164";
+        options.Authority = identityUrl;
         options.Audience = "catalog";
         options.RequireHttpsMetadata = false; // For development
     });
 
 var app = builder.Build();
 
-
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -47,3 +50,4 @@ app.MapControllers();
 app.Run();
 
 public record PublicKeyResponse(string PublicKey);
+

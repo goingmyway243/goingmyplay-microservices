@@ -2,6 +2,8 @@ using Play.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 // Add services to the container.
 builder.Services.AddIdentityServer(options =>
     {
@@ -24,6 +26,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -38,3 +42,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
