@@ -7,8 +7,7 @@ var elasticsearch = builder.AddElasticsearch("elasticsearch")
 
 // Add Identity Service
 var identity = builder.AddProject<Projects.Play_Identity>("identity")
-    .WithExternalHttpEndpoints()
-    .WithHttpsEndpoint(port: 7164, name: "https");
+    .WithExternalHttpEndpoints();
 
 // Add Catalog Service with Elasticsearch
 var catalog = builder.AddProject<Projects.Play_Catalog>("catalog")

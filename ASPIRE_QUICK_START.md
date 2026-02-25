@@ -12,8 +12,8 @@
 
 ## What We Added
 
-### 1. GoingMyPlay.AppHost (Orchestrator)
-Located in: `src/GoingMyPlay.AppHost/`
+### 1. Play.AppHost (Orchestrator)
+Located in: `src/Play.AppHost/`
 
 This project orchestrates all services:
 ```csharp
@@ -41,8 +41,8 @@ var payment = builder.AddProject<Projects.Play_Payment>("payment")
     .WithExternalHttpEndpoints();
 ```
 
-### 2. GoingMyPlay.ServiceDefaults (Shared Configuration)
-Located in: `src/GoingMyPlay.ServiceDefaults/`
+### 2. Play.ServiceDefaults (Shared Configuration)
+Located in: `src/Play.ServiceDefaults/`
 
 Provides shared functionality for all services:
 - OpenTelemetry instrumentation
@@ -71,7 +71,7 @@ docker ps
 
 ### Step 2: Run the AppHost
 ```bash
-cd src/GoingMyPlay.AppHost
+cd src/Play.AppHost
 dotnet run
 ```
 
@@ -137,7 +137,7 @@ var elasticsearchUrl = builder.Configuration.GetConnectionString("elasticsearch"
 
 ### 1. Start the Application
 ```bash
-cd src/GoingMyPlay.AppHost
+cd src/Play.AppHost
 dotnet run
 ```
 
@@ -195,7 +195,7 @@ dotnet new webapi -n Play.NewService -o src/Play.NewService
 
 ### Step 2: Add ServiceDefaults Reference
 ```bash
-dotnet add src/Play.NewService reference src/GoingMyPlay.ServiceDefaults
+dotnet add src/Play.NewService reference src/Play.ServiceDefaults
 ```
 
 ### Step 3: Update Program.cs
@@ -217,14 +217,14 @@ app.Run();
 
 ### Step 4: Add to AppHost
 ```csharp
-// In src/GoingMyPlay.AppHost/Program.cs
+// In src/Play.AppHost/Program.cs
 var newService = builder.AddProject<Projects.Play_NewService>("newservice")
     .WithExternalHttpEndpoints();
 ```
 
 ### Step 5: Add Project Reference
 ```bash
-dotnet add src/GoingMyPlay.AppHost reference src/Play.NewService
+dotnet add src/Play.AppHost reference src/Play.NewService
 ```
 
 Done! Your new service is now orchestrated!
@@ -233,7 +233,7 @@ Done! Your new service is now orchestrated!
 
 ```bash
 # Run with hot reload
-dotnet watch --project src/GoingMyPlay.AppHost
+dotnet watch --project src/Play.AppHost
 
 # Run tests
 dotnet test
@@ -289,13 +289,13 @@ docker rm <container-id>
 ## Key Files to Know
 
 ```
-src/GoingMyPlay.AppHost/
+src/Play.AppHost/
 ??? Program.cs              # Service orchestration
 ??? Properties/
 ?   ??? launchSettings.json # Dashboard URL configuration
 ??? appsettings.json        # Logging configuration
 
-src/GoingMyPlay.ServiceDefaults/
+src/Play.ServiceDefaults/
 ??? Extensions.cs           # Shared configuration
 ```
 

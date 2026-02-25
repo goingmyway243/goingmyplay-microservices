@@ -1,23 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>Exe</OutputType>
-    <IsAspireHost>true</IsAspireHost>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="9.1.0" />
-    <PackageReference Include="Aspire.Hosting.Elasticsearch" Version="9.1.0" />
+    <PackageReference Include="Aspire.Hosting.Elasticsearch" Version="13.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Play.Catalog\Play.Catalog.csproj" />
     <ProjectReference Include="..\Play.Identity\Play.Identity.csproj" />
     <ProjectReference Include="..\Play.Payment\Play.Payment.csproj" />
-    <ProjectReference Include="..\GoingMyPlay.ServiceDefaults\GoingMyPlay.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

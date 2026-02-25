@@ -1,4 +1,4 @@
-# GoingMyPlay Microservices with .NET Aspire
+# Play Microservices with .NET Aspire
 
 This solution demonstrates a microservices architecture using .NET Aspire for orchestration, observability, and service discovery.
 
@@ -26,13 +26,13 @@ This solution demonstrates a microservices architecture using .NET Aspire for or
 
 ## Projects
 
-### 1. **GoingMyPlay.AppHost** - Aspire Orchestrator
+### 1. **Play.AppHost** - Aspire Orchestrator
 - Orchestrates all microservices
 - Provides service discovery
 - Manages Elasticsearch container
 - Exposes Aspire Dashboard for observability
 
-### 2. **GoingMyPlay.ServiceDefaults** - Shared Configuration
+### 2. **Play.ServiceDefaults** - Shared Configuration
 - OpenTelemetry instrumentation (metrics, tracing, logging)
 - Health checks
 - HTTP resilience patterns
@@ -67,7 +67,7 @@ This solution demonstrates a microservices architecture using .NET Aspire for or
 #### Option 1: Run with Aspire AppHost (Recommended)
 
 ```bash
-cd src/GoingMyPlay.AppHost
+cd src/Play.AppHost
 dotnet run
 ```
 
@@ -191,7 +191,7 @@ Built-in resilience with `Microsoft.Extensions.Http.Resilience`:
 ### 1. **Local Development**
 ```bash
 # Run with hot reload
-dotnet watch --project src/GoingMyPlay.AppHost
+dotnet watch --project src/Play.AppHost
 ```
 
 ### 2. **Running Tests**
@@ -215,7 +215,7 @@ dotnet build src/Play.Catalog
 ## Configuration
 
 ### AppHost Configuration
-Edit `src/GoingMyPlay.AppHost/Program.cs` to:
+Edit `src/Play.AppHost/Program.cs` to:
 - Add/remove services
 - Configure container resources
 - Set environment variables
@@ -276,10 +276,10 @@ dotnet publish --os linux --arch x64 /t:PublishContainer
 ## Project Structure
 
 ```
-goingmyplay-microservices/
+Play-microservices/
 ??? src/
-?   ??? GoingMyPlay.AppHost/          # Aspire orchestrator
-?   ??? GoingMyPlay.ServiceDefaults/  # Shared configuration
+?   ??? Play.AppHost/          # Aspire orchestrator
+?   ??? Play.ServiceDefaults/  # Shared configuration
 ?   ??? Play.Identity/                # Identity service
 ?   ??? Play.Catalog/                 # Catalog service
 ?   ??? Play.Payment/                 # Payment service

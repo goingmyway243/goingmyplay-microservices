@@ -1,9 +1,9 @@
-# ?? Run Your GoingMyPlay Microservices in 3 Steps
+# ?? Run Your Play Microservices in 3 Steps
 
 ## Step 1: Start the Orchestrator
 
 ```bash
-cd src/GoingMyPlay.AppHost
+cd src/Play.AppHost
 dotnet run
 ```
 
@@ -78,7 +78,7 @@ Import this collection:
 ```json
 {
   "info": {
-    "name": "GoingMyPlay Microservices"
+    "name": "Play Microservices"
   },
   "item": [
     {
